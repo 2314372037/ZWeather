@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/SettingPanel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/bingimg"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/><!--背景-->
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:background="#586b6b6b"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/view_city"
+                android:textStyle="bold"
+                android:textSize="56dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_temp"
+                android:textSize="92dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" /><!--温度-->
+            <TextView
+                android:id="@+id/view_weather"
+                android:textSize="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" /><!--天气-->
+            <TextView
+                android:id="@+id/view_aqi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" /><!--空气质量-->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/view_wind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" /><!--风-->
+                <TextView
+                    android:id="@+id/view_humidity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" /><!--湿度-->
+            </LinearLayout>
+            <TextView
+                android:text="每日"
+                android:textSize="26dp"
+                android:layout_marginLeft="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <HorizontalScrollView
+                android:id="@+id/scrollView"
+                android:background="#27ffffff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </HorizontalScrollView>
+            <TextView
+                android:text="指数"
+                android:textSize="26dp"
+                android:layout_marginLeft="2dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/view_iname_ivalue1"
+                android:textSize="18dp"
+                android:textColor="@color/home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_detail1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/view_iname_ivalue2"
+                android:textSize="18dp"
+                android:textColor="@color/home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_detail2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/view_iname_ivalue3"
+                android:textSize="18dp"
+                android:textColor="@color/home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_detail3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/view_iname_ivalue4"
+                android:textSize="18dp"
+                android:textColor="@color/home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_detail4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/view_iname_ivalue5"
+                android:textSize="18dp"
+                android:textColor="@color/home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_detail5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/view_iname_ivalue6"
+                android:textSize="18dp"
+                android:textColor="@color/home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_detail6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textStyle="bold"
+                android:id="@+id/view_iname_ivalue7"
+                android:textSize="18dp"
+                android:textColor="@color/home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_detail7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_marginTop="13dp"
+                android:layout_marginBottom="14dp"
+                android:id="@+id/view_updateTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+</ScrollView>
+    <com.wnafee.vector.MorphButton
+        android:id="@+id/menubutton"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:scaleType="fitCenter"
+        android:layout_gravity="right"
+        app:vc_autoStartAnimation="true"
+        app:vc_backgroundTint="#f50057"
+        app:vc_foregroundTint="#d7ffffff"
+        app:vc_startDrawable="@drawable/ic_arrow_to_drawer"
+        app:vc_endDrawable="@drawable/ic_drawer_to_arrow"/>
+</FrameLayout>
+        <LinearLayout
+            android:layout_gravity="left|bottom"
+            android:background="#454545"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <TextView
+                android:text="地区"
+                android:textSize="26dp"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:id="@+id/view_edit_city"
+                android:hint="例如:重庆市或渝北区"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Button
+                android:text="保存"
+                android:textSize="26dp"
+                android:id="@+id/save_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Button
+                android:layout_marginTop="20dp"
+                android:id="@+id/ref_btn"
+                android:textSize="26dp"
+                android:text="刷新今日天气 "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </android.support.v4.widget.DrawerLayout>
+</FrameLayout>
