@@ -167,7 +167,7 @@ public class utils {
 
     public String getJson(String method, String city) {
 
-        String key = ""//api_key,需要填入自己的appkey(自己添加;)
+        String key = "98fade718660bf21";//api_key,需要填入自己的appkey(自己添加;)
         HttpURLConnection connection = null;
         InputStream inputStream = null;
         BufferedReader bufferedReader = null;

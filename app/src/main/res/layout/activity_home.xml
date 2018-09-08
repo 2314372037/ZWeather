@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/><!--背景-->
 <FrameLayout
+    android:background="#81000000"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ScrollView
@@ -35,15 +36,33 @@
                 android:textSize="92dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" /><!--温度-->
+
             <TextView
                 android:id="@+id/view_weather"
                 android:textSize="30dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" /><!--天气-->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="空气质量指数 "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
             <TextView
                 android:id="@+id/view_aqi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" /><!--空气质量-->
+            <TextView
+                android:text=" 级别 "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/view_api_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -57,9 +76,10 @@
                     android:layout_height="wrap_content" /><!--湿度-->
             </LinearLayout>
             <TextView
+                android:id="@+id/dayTitle"
                 android:text="每日"
                 android:textSize="26dp"
-                android:layout_marginLeft="2dp"
+                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <HorizontalScrollView
@@ -69,9 +89,10 @@
                 android:layout_height="wrap_content">
             </HorizontalScrollView>
             <TextView
+                android:id="@+id/infoTitle"
                 android:text="指数"
                 android:textSize="26dp"
-                android:layout_marginLeft="2dp"
+                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
             <TextView

@@ -2,6 +2,8 @@ package com.example.zweather.h;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -47,6 +49,7 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
     EditText view_edit_city=null;
     TextView view_updateTime=null;
     TextView view_aqi=null;
+    TextView view_api_info;
     TextView view_city = null;
     TextView view_temp = null;
     TextView view_weather = null;
@@ -66,6 +69,8 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
     TextView view_detail6 = null;
     TextView view_iname_value7 = null;
     TextView view_detail7 = null;
+    TextView dayTitle = null;
+    TextView infoTitle = null;
     Button save_button=null;
 
     @Override
@@ -77,7 +82,7 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         view_edit_city.setText(sharedPreferences.getString("city","永川"));
         bingimg = (ImageView) findViewById(R.id.bingimg);
         _utils = new utils(HomeActivity.this);
-        loadBingPic();
+        showimage("https://open.saintic.com/api/bingPic/?&picSize=2");
         settingPanel.addDrawerListener(this);
         ref_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,12 +173,10 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         } else {
             _utils.parseJson(jsondata);
             String time= sharedPreferences.getString("time",null);
-            if (time!=""||time!=null)
+            long curTime=System.currentTimeMillis()-86400000;
+            if (time!=null||time!="")
             {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd");
-                Date curDate = new Date(System.currentTimeMillis());
-                String str = formatter.format(curDate);
-                if (Integer.parseInt(str)>Integer.parseInt(time))//如果今天的时间是大于昨天的时间
+                if (curTime>Long.parseLong(time))//如果今天的时间是大于昨天的时间
                 {
                     Runnable runnable = new Runnable() {
                         @Override
@@ -197,47 +200,7 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
             Log.d(TAG, "本地获取jsondata,开始解析" + jsondata);
         }
     }
-    private void loadBingPic() {//加载bing图片
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String Bing = "http://guolin.tech/api/bing_pic";
-                BufferedReader bufferedReader = null;
-                InputStream stream = null;
-                HttpURLConnection connection = null;
-                try {
-                    URL url = new URL(Bing);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setReadTimeout(5000);
-                    connection.setConnectTimeout(5000);
-                    stream = connection.getInputStream();
-                    bufferedReader = new BufferedReader(new InputStreamReader(stream));
-                    StringBuilder builder = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        builder.append(line);
-                    }
-                    Log.d(TAG, "loadBingPic: 请求成功" + builder.toString());
-                    SharedPreferences.Editor sharedPreferences = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this).edit();
-                    sharedPreferences.putString("url", builder.toString());
-                    sharedPreferences.apply();
-                    showimage(builder.toString());//显示
-                } catch (IOException io) {
-                    io.printStackTrace();
-                } finally {
-                    try {
-                        if (bufferedReader != null)
-                            bufferedReader.close();
-                        if (connection != null)
-                            connection.connect();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    }
-                }
-            }
-        }).start();
-    }//获取bing图片//
+    //获取bing图片
     private void showimage(final String string) {//显示bing壁纸--Glide
         runOnUiThread(new Runnable() {
             @Override
@@ -253,6 +216,7 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         scrollView=(HorizontalScrollView)findViewById(R.id.scrollView);
         view_updateTime=(TextView)findViewById(R.id.view_updateTime);
         view_aqi=(TextView)findViewById(R.id.view_aqi);
+        view_api_info=(TextView)findViewById(R.id.view_api_info);
         view_city = (TextView) findViewById(R.id.view_city);
         view_temp = (TextView) findViewById(R.id.view_temp);
         view_weather = (TextView) findViewById(R.id.view_weather);
@@ -274,14 +238,15 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         view_detail7 = (TextView) findViewById(R.id.view_detail7);
         menuButton=(MorphButton) findViewById(R.id.menubutton);
         settingPanel=(DrawerLayout)findViewById(R.id.SettingPanel);
+        dayTitle=(TextView)findViewById(R.id.dayTitle);
+        infoTitle=(TextView)findViewById(R.id.infoTitle);
     }//初始话界面控件实例
     private void showOnUi() {
         Mode mode = new Mode();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd");
-        Date curDate = new Date(System.currentTimeMillis());
-        String str = formatter.format(curDate);
+        String currentDate=String.valueOf(System.currentTimeMillis());
+        Log.d("当前时间:",String.valueOf(System.currentTimeMillis()));
         SharedPreferences.Editor sharedPreferences_write=getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
-        sharedPreferences_write.putString("time",str);
+        sharedPreferences_write.putString("time",currentDate);
         sharedPreferences_write.apply();
         view_updateTime.setText("更新时间 "+mode.getUpdatetime());
         view_edit_city.setText(mode.getCity());
@@ -289,8 +254,32 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         view_temp.setText(" "+mode.getTemp() + "°");
         view_weather.setText(mode.getWeather());
         view_wind.setText("风速" + mode.getWindspeed() + " " + mode.getWinddirect() + mode.getWindpower());
-        view_humidity.setText("\t湿度 " + mode.getHumidity());
-        view_aqi.setText("空气质量指数 "+mode.getAqi()+" 级别"+mode.getQuality());
+        view_humidity.setText(" 湿度" + mode.getHumidity());
+        view_aqi.setText(mode.getAqi());
+        view_api_info.setText(mode.getQuality());
+        int apinum=Integer.parseInt(mode.getAqi());
+        if (apinum<50)
+        {
+            view_aqi.setBackground(new ColorDrawable(Color.parseColor("#7CCD7C")));
+            view_api_info.setBackground(new ColorDrawable(Color.parseColor("#9ACD32")));
+        }else if (apinum>50&&apinum<100)
+        {
+            view_aqi.setBackground(new ColorDrawable(Color.parseColor("#CDC673")));
+            view_api_info.setBackground(new ColorDrawable(Color.parseColor("#8FBC8F")));
+        }else if (apinum>100&&apinum<150)
+        {
+            view_aqi.setBackground(new ColorDrawable(Color.parseColor("#CD4F39")));
+            view_api_info.setBackground(new ColorDrawable(Color.parseColor("#8E8E38")));
+        }else if (apinum>150&&apinum<200)
+        {
+            view_aqi.setBackground(new ColorDrawable(Color.parseColor("#CD3333")));
+            view_api_info.setBackground(new ColorDrawable(Color.parseColor("#8E8E38")));
+        }
+        else if (apinum>200)
+        {
+            view_aqi.setBackground(new ColorDrawable(Color.parseColor("#CD0000")));
+            view_api_info.setBackground(new ColorDrawable(Color.parseColor("#8B8989")));
+        }
         createEveryDayWeather(mode,7);
         for (int i = 0; i < 7; i++) {
             switch (i) {
@@ -350,24 +339,27 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
             linearLayout2.setOrientation(LinearLayout.HORIZONTAL);
             linearLayout2.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             time_info.setText(mode.getDaily_week(i));
-            time_info.setTextSize(22);
-            temp_hight.setText("白:"+mode.getDaily_temphight(i));
+            time_info.setTextSize(24);
+            temp_hight.setText(" | "+mode.getDaily_temphight(i)+"         ");
             temp_hight.setTextSize(16);
-            temp_low.setText(" | 晚:"+mode.getDaily_templow(i));
+            temp_low.setText(mode.getDaily_templow(i));
+            temp_low.setTextSize(18);
             weather.setText(mode.getDaily_day_weather(i));
-            weather.setTextSize(15);
+            weather.setTextSize(18);
             int a=8*Integer.parseInt(mode.getDaily_temphight(i));//动态温度颜色
-            if (a>255)a=255;weather.setTextColor(Color.argb(255,a,40,40));
+            if (a>255)a=255;weather.setTextColor(Color.argb(255,a,142,35));
             int resId= _utils.getResId("img"+mode.getDaily_day_img(i),R.drawable.class);
             imageView.setImageResource(resId);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(48,50));
-            linearLayout2.addView(temp_hight);
             linearLayout2.addView(temp_low);
+            linearLayout2.addView(temp_hight);
             linearLayout1.addView(time_info);
             linearLayout1.addView(linearLayout2);
             linearLayout1.addView(imageView);
             linearLayout1.addView(weather);
             linearLayout.addView(linearLayout1);
+            dayTitle.setVisibility(View.VISIBLE);
+            infoTitle.setVisibility(View.VISIBLE);
         }
        scrollView.addView(linearLayout);
     }//动态创建每日天气

@@ -13,7 +13,7 @@ import android.view.WindowManager;
 
 public class starthome extends AppCompatActivity {
 
-    private final int startTime=1000;//启动延时(秒)
+    private final int startTime=500;//启动延时(毫秒)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
