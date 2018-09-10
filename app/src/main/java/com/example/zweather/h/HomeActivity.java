@@ -10,6 +10,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,9 +88,6 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         ref_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                settingPanel.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                scrollView.removeAllViews();
-                Toast.makeText(HomeActivity.this, "正在刷新", Toast.LENGTH_LONG).show();
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
@@ -98,9 +96,17 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(HomeActivity.this, "刷新完成", Toast.LENGTH_SHORT).show();
+                                settingPanel.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                                scrollView.removeAllViews();
+                                Toast.makeText(HomeActivity.this, "完成", Toast.LENGTH_SHORT).show();
                                 String jsondata = _utils.readfile(jsonFileName);
                                 _utils.parseJson(jsondata);
+                                String currentDate=String.valueOf(System.currentTimeMillis());
+                                Log.d("当前时间:",String.valueOf(System.currentTimeMillis()));
+                                SharedPreferences.Editor sharedPreferences_write=getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
+                                sharedPreferences_write.putString("time",currentDate);
+                                sharedPreferences_write.apply();
+                                Toast.makeText(HomeActivity.this,"保存当前时间戳："+currentDate,Toast.LENGTH_LONG);
                                 showOnUi();
                             }
                         });
@@ -113,12 +119,6 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         save_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences.Editor sharedPreferences_write=getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
-                sharedPreferences_write.putString("city",view_edit_city.getText().toString());
-                sharedPreferences_write.apply();
-                settingPanel.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                scrollView.removeAllViews();
-                Toast.makeText(HomeActivity.this, "获取中", Toast.LENGTH_LONG).show();
                 Runnable runnable = new Runnable() {
                     @Override
                     public void run() {
@@ -127,9 +127,19 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                SharedPreferences.Editor sharedPreferences_write=getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
+                                sharedPreferences_write.putString("city",view_edit_city.getText().toString());
+                                String currentDate=String.valueOf(System.currentTimeMillis());
+                                Log.d("当前时间:",String.valueOf(System.currentTimeMillis()));
+                                sharedPreferences_write.putString("time",currentDate);
+                                sharedPreferences_write.apply();
+                                Toast.makeText(HomeActivity.this,"保存当前时间戳："+currentDate,Toast.LENGTH_LONG);
+                                settingPanel.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                                scrollView.removeAllViews();
                                 Toast.makeText(HomeActivity.this, "完成", Toast.LENGTH_SHORT).show();
                                 String jsondata = _utils.readfile(jsonFileName);
                                 _utils.parseJson(jsondata);
+
                                 showOnUi();
                             }
                         });
@@ -150,6 +160,12 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
                         String jsondata = _utils.readfile(jsonFileName);
                         Toast.makeText(HomeActivity.this, "获取成功", Toast.LENGTH_SHORT).show();
                         _utils.parseJson(jsondata);
+                        String currentDate=String.valueOf(System.currentTimeMillis());
+                        Log.d("当前时间:",String.valueOf(System.currentTimeMillis()));
+                        SharedPreferences.Editor sharedPreferences_write=getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
+                        sharedPreferences_write.putString("time",currentDate);
+                        sharedPreferences_write.apply();
+                        Toast.makeText(HomeActivity.this,"保存当前时间戳："+currentDate,Toast.LENGTH_LONG);
                         showOnUi();
                         //显示到ui
                         break;
@@ -173,7 +189,7 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
         } else {
             _utils.parseJson(jsondata);
             String time= sharedPreferences.getString("time",null);
-            long curTime=System.currentTimeMillis()-86400000;
+            long curTime=System.currentTimeMillis()-43200000;
             if (time!=null||time!="")
             {
                 if (curTime>Long.parseLong(time))//如果今天的时间是大于昨天的时间
@@ -243,18 +259,13 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
     }//初始话界面控件实例
     private void showOnUi() {
         Mode mode = new Mode();
-        String currentDate=String.valueOf(System.currentTimeMillis());
-        Log.d("当前时间:",String.valueOf(System.currentTimeMillis()));
-        SharedPreferences.Editor sharedPreferences_write=getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
-        sharedPreferences_write.putString("time",currentDate);
-        sharedPreferences_write.apply();
         view_updateTime.setText("更新时间 "+mode.getUpdatetime());
         view_edit_city.setText(mode.getCity());
         view_city.setText(mode.getCity());
         view_temp.setText(" "+mode.getTemp() + "°");
         view_weather.setText(mode.getWeather());
         view_wind.setText("风速" + mode.getWindspeed() + " " + mode.getWinddirect() + mode.getWindpower());
-        view_humidity.setText(" 湿度" + mode.getHumidity());
+        view_humidity.setText(" 湿度" + mode.getHumidity()+"%");
         view_aqi.setText(mode.getAqi());
         view_api_info.setText(mode.getQuality());
         int apinum=Integer.parseInt(mode.getAqi());
@@ -340,7 +351,14 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
             linearLayout2.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             time_info.setText(mode.getDaily_week(i));
             time_info.setTextSize(24);
-            temp_hight.setText(" | "+mode.getDaily_temphight(i)+"         ");
+            SimpleDateFormat sDateFormat = new SimpleDateFormat("HH");
+            String time= sDateFormat.format(new Date());
+            if (Integer.parseInt(time)>18)
+            {
+                temp_hight.setText(" | "+mode.getDaily_night_weather(i)+"         ");
+            }else{
+                temp_hight.setText(" | "+mode.getDaily_day_weather(i)+"         ");
+            }
             temp_hight.setTextSize(16);
             temp_low.setText(mode.getDaily_templow(i));
             temp_low.setTextSize(18);
