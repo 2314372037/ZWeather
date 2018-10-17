@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Time;
@@ -43,7 +44,6 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
     utils _utils = null;
     Button ref_button=null;
     String jsonFileName = "data.json";
-    Handler handler = null;
     HorizontalScrollView scrollView=null;
     MorphButton menuButton=null;
     DrawerLayout settingPanel=null;
@@ -74,6 +74,38 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
     TextView infoTitle = null;
     Button save_button=null;
 
+    private static class sHandler extends Handler{
+        private final WeakReference<HomeActivity> activity;
+        public sHandler(HomeActivity activity){
+            this.activity=new WeakReference<HomeActivity>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg){
+            HomeActivity homeActivity=this.activity.get();
+            if (homeActivity==null){
+                super.handleMessage(msg);
+                return ;
+            }
+            switch (msg.arg1) {
+                case 1:
+                    homeActivity._utils.writerfile(homeActivity.jsonFileName, (String) msg.obj);
+                    String jsondata = homeActivity._utils.readfile(homeActivity.jsonFileName);
+                    Toast.makeText(homeActivity, "获取成功", Toast.LENGTH_SHORT).show();
+                    homeActivity._utils.parseJson(jsondata);
+                    String currentDate=String.valueOf(System.currentTimeMillis());
+                    Log.d("当前时间:",String.valueOf(System.currentTimeMillis()));
+                    SharedPreferences.Editor sharedPreferences_write=homeActivity.getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
+                    sharedPreferences_write.putString("time",currentDate);
+                    sharedPreferences_write.apply();
+                    Toast.makeText(homeActivity,"保存当前时间戳："+currentDate,Toast.LENGTH_LONG);
+                    homeActivity.showOnUi();
+                    //显示到ui
+                    break;
+            }
+        }
+    }
+    private final sHandler sh=new sHandler(HomeActivity.this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,40 +182,20 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
             }
         });
         menuButton.setOnStateChangedListener(this);
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                switch (msg.arg1) {
-                    case 1:
-                        _utils.writerfile(jsonFileName, (String) msg.obj);
-                        String jsondata = _utils.readfile(jsonFileName);
-                        Toast.makeText(HomeActivity.this, "获取成功", Toast.LENGTH_SHORT).show();
-                        _utils.parseJson(jsondata);
-                        String currentDate=String.valueOf(System.currentTimeMillis());
-                        Log.d("当前时间:",String.valueOf(System.currentTimeMillis()));
-                        SharedPreferences.Editor sharedPreferences_write=getSharedPreferences("save_time.dat",MODE_PRIVATE).edit();//写入
-                        sharedPreferences_write.putString("time",currentDate);
-                        sharedPreferences_write.apply();
-                        Toast.makeText(HomeActivity.this,"保存当前时间戳："+currentDate,Toast.LENGTH_LONG);
-                        showOnUi();
-                        //显示到ui
-                        break;
-                }
-            }
-        };
         String jsondata = _utils.readfile(jsonFileName);
-        if (jsondata == "" || jsondata == null) {
+        if (jsondata == null||jsondata == "") {
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
                     String jsondata = _utils.getJson("city", view_edit_city.getText().toString());
+                    Log.d("获取到的json：",jsondata);
                     Message message = new Message();
                     message.arg1 = 1;
                     message.obj = jsondata;
-                    handler.sendMessage(message);
+                    sh.sendMessage(message);
                 }
             };
+
             Thread thread = new Thread(runnable);
             thread.start();
         } else {
@@ -201,7 +213,7 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
                             Message message = new Message();
                             message.arg1 = 1;
                             message.obj = jsondata;
-                            handler.sendMessage(message);
+                            sh.sendMessage(message);
                         }
                     };
                     Thread thread = new Thread(runnable);
@@ -346,7 +358,7 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
             weather=new TextView(this);
             imageView=new ImageView(this);
             linearLayout1.setOrientation(LinearLayout.VERTICAL);
-            linearLayout1.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            linearLayout1.setLayoutParams(new LinearLayout.LayoutParams(240, ViewGroup.LayoutParams.MATCH_PARENT));
             linearLayout2.setOrientation(LinearLayout.HORIZONTAL);
             linearLayout2.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             time_info.setText(mode.getDaily_week(i));
@@ -355,12 +367,12 @@ public class HomeActivity extends AppCompatActivity implements MorphButton.OnSta
             String time= sDateFormat.format(new Date());
             if (Integer.parseInt(time)>18)
             {
-                temp_hight.setText(" | "+mode.getDaily_night_weather(i)+"         ");
+                temp_hight.setText(" | "+mode.getDaily_night_img(i)+"°");
             }else{
-                temp_hight.setText(" | "+mode.getDaily_day_weather(i)+"         ");
+                temp_hight.setText(" | "+mode.getDaily_temphight(i)+"°");
             }
             temp_hight.setTextSize(16);
-            temp_low.setText(mode.getDaily_templow(i));
+            temp_low.setText(mode.getDaily_templow(i)+"°");
             temp_low.setTextSize(18);
             weather.setText(mode.getDaily_day_weather(i));
             weather.setTextSize(18);
